@@ -20,7 +20,8 @@ def face_datasets():
     return [
         datasets.load_dataset("facedata/facedatatrain", "facedata/facedatatrainlabels", FACE_HEIGHT),
         datasets.load_dataset("facedata/facedatavalidation", "facedata/facedatavalidationlabels", FACE_HEIGHT),
-        datasets.load_dataset("facedata/facedatatest", "facedata/facedatatestlabels", FACE_HEIGHT)
+        datasets.load_dataset("facedata/facedatatest", "facedata/facedatatestlabels", FACE_HEIGHT),
+        "faces"
     ]
 
 
@@ -28,12 +29,13 @@ def digit_datasets():
     return [
         datasets.load_dataset("digitdata/trainingimages", "digitdata/traininglabels", DIGIT_HEIGHT),
         datasets.load_dataset("digitdata/validationimages", "digitdata/validationlabels", DIGIT_HEIGHT),
-        datasets.load_dataset("digitdata/testimages", "digitdata/testlabels", DIGIT_HEIGHT)
+        datasets.load_dataset("digitdata/testimages", "digitdata/testlabels", DIGIT_HEIGHT),
+        "digits"
     ]
 
 
 def run_test(datasets, algorithm):
-    training, validation, test = datasets
+    training, validation, test, dataname = datasets
     percentages = map(lambda x: x/10, range(1, 11))
 
     datapoints = []
@@ -45,7 +47,7 @@ def run_test(datasets, algorithm):
         end_time = monotonic()
 
         accuracy = algorithm.validate(test)
-        datapoints.append((count, end_time - start_time, accuracy))
+        datapoints.append((dataname, count, end_time - start_time, accuracy))
 
     return datapoints
 
@@ -95,19 +97,16 @@ def main():
         parser.print_help(sys.stdout)
         print("Exiting.")
         return
+
     elif not (algorithm and datasource):
         # didn't specify the algorithm or what data to execute on
         print("Must specify both -a and -d.\nExiting.")
+
     else:
         # both algorithm and data set is provided
-        data = []
-        labels = []
-        if datasource == "face":
-            data = face_datasets()
-            labels = [0, 1]
-        else:
-            data = digit_datasets()
-            labels = list(range(0, 10))
+        # get correct dataset and labels
+        data = {"face": face_datasets, "digit": digit_datasets}[datasource]()
+        labels = {"face": [0, 1], "digit": list(range(0, 10))}[datasource]
         # get specific algorithm
         algorithm = algorithms[algorithm-1](labels)
         # evaluate algorithm on the given data
@@ -115,13 +114,13 @@ def main():
 
     # output results
     if csv:
-        print("algorithm,training set size,training time,accuracy")
+        print("algorithm,data type,training set size,training time,accuracy")
         for algorithm in datapoints.keys():
             if len(datapoints[algorithm]) == 0:
                 continue
 
             for entry in datapoints[algorithm]:
-                print(algorithm, ",", entry[0], ",", entry[1], ",", entry[2], sep="")
+                print(algorithm, entry[0], entry[1], entry[2], entry[3], sep=",")
     else:
         for algorithm in datapoints.keys():
             if len(datapoints[algorithm]) == 0:
@@ -129,9 +128,10 @@ def main():
 
             for entry in datapoints[algorithm]:
                 print("Algorithm:     ", algorithm)
-                print("Training size: ", entry[0])
-                print("Training time: ", entry[1])
-                print("Accuracy:      ", entry[2])
+                print("Data type:     ", entry[0])
+                print("Training size: ", entry[1])
+                print("Training time: ", entry[2])
+                print("Accuracy:      ", entry[3])
 
 
 if __name__ == "__main__":
