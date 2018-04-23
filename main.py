@@ -121,7 +121,7 @@ def main():
                 continue
 
             for entry in datapoints[algorithm]:
-                print(algorithm.name(), ",", entry[0], ",", entry[1], ",", entry[2])
+                print(algorithm, ",", entry[0], ",", entry[1], ",", entry[2], sep="")
     else:
         for algorithm in datapoints.keys():
             if len(datapoints[algorithm]) == 0:
