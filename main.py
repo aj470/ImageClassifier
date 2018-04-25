@@ -131,7 +131,7 @@ def main():
                 print("Data type:     ", entry[0])
                 print("Training size: ", entry[1])
                 print("Training time: ", entry[2])
-                print("Accuracy:      ", entry[3])
+                print("Accuracy:      ", entry[3], "\n")
 
 
 if __name__ == "__main__":
