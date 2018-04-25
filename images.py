@@ -8,6 +8,9 @@ class Datum:
     def data(self):
         return self._data.copy()
 
+    def flat_data(self):
+        return [pixel for line in self._data for pixel in line]
+
     def get_pixel(self, x, y):
         return self._data[y][x]
 
@@ -47,7 +50,7 @@ def load_images(filename, height):
 
     with open(filename) as file:
         for line in file:
-            lines.append(line.strip())
+            lines.append(line.replace("\n", ""))
             if len(lines) == height:
                 images.append(Datum(lines))
                 lines = []
