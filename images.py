@@ -2,7 +2,7 @@
 
 class Datum:
     def __init__(self, data):
-        self._data = list(map(lambda x: list(map(ascii2float, x)), data))  # convert chars to float values
+        self._data = data
         self._value = 0
 
     def data(self):
@@ -52,7 +52,8 @@ def load_images(filename, height):
         for line in file:
             lines.append(line.replace("\n", ""))
             if len(lines) == height:
-                images.append(Datum(lines))
+                image = list(map(lambda x: list(map(ascii2float, x)), lines))  # convert chars to float values
+                images.append(Datum(image))
                 lines = []
 
     if len(lines) > 0:

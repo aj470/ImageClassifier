@@ -22,6 +22,10 @@ class Dataset:
     def get_labeled_images(self):
         return self._pairs
 
+    def extract(self, extractor):
+        for i in range(len(self._images)):
+            self._images[i] = extractor(self._images[i])
+
     def get_images(self):
         return self._images.copy()
 

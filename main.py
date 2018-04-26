@@ -38,6 +38,10 @@ def run_test(datasets, algorithm):
     training, validation, test, dataname = datasets
     percentages = map(lambda x: x/10, range(1, 11))
 
+    training.extract(basic_feature_extractor)
+    validation.extract(basic_feature_extractor)
+    test.extract(basic_feature_extractor)
+
     datapoints = []
     for percent in percentages:
         count = int(percent * len(training))
