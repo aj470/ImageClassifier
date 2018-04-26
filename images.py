@@ -19,7 +19,7 @@ class Datum:
             for pixel in line:
                 if pixel == 0:
                     print(" ", end="")
-                elif pixel == 0.5:
+                elif 0 < pixel < 1:
                     print("+", end="")
                 else:
                     print("#", end="")

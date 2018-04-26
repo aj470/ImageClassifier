@@ -6,6 +6,7 @@ import sys
 
 from time import monotonic
 from classifier import *
+from features import *
 
 # dimensions in characters
 # widths aren't used
@@ -16,31 +17,49 @@ DIGIT_WIDTH = 28
 DIGIT_HEIGHT = 28
 
 
-def face_datasets():
-    return [
+def face_datasets(extract, printe):
+    dataset_arr = [
         datasets.load_dataset("facedata/facedatatrain", "facedata/facedatatrainlabels", FACE_HEIGHT),
         datasets.load_dataset("facedata/facedatavalidation", "facedata/facedatavalidationlabels", FACE_HEIGHT),
         datasets.load_dataset("facedata/facedatatest", "facedata/facedatatestlabels", FACE_HEIGHT),
         "faces"
     ]
 
+    for dataset in dataset_arr[:3]:
+        originals = None
+        if printe:
+            originals = dataset.get_images()
+        dataset.extract(extract)
+        if printe:
+            for i in range(len(originals)):
+                originals[i].print()
+                dataset.get_image(i).print()
+    return dataset_arr
 
-def digit_datasets():
-    return [
+
+def digit_datasets(extract, printe):
+    dataset_arr = [
         datasets.load_dataset("digitdata/trainingimages", "digitdata/traininglabels", DIGIT_HEIGHT),
         datasets.load_dataset("digitdata/validationimages", "digitdata/validationlabels", DIGIT_HEIGHT),
         datasets.load_dataset("digitdata/testimages", "digitdata/testlabels", DIGIT_HEIGHT),
         "digits"
     ]
 
+    for dataset in dataset_arr[:3]:
+        originals = None
+        if printe:
+            originals = dataset.get_images()
+        dataset.extract(extract)
+        if printe:
+            for i in range(len(originals)):
+                originals[i].print()
+                dataset.get_image(i).print()
+    return dataset_arr
+
 
 def run_test(datasets, algorithm):
     training, validation, test, dataname = datasets
     percentages = map(lambda x: x/10, range(1, 11))
-
-    training.extract(basic_feature_extractor)
-    validation.extract(basic_feature_extractor)
-    test.extract(basic_feature_extractor)
 
     datapoints = []
     for percent in percentages:
@@ -66,6 +85,11 @@ def main():
                         help="whether to evaluate faces or digits", default=None)
     parser.add_argument("-c", "--csv", help="Output CSV data",
                         action='store_true', default=None)
+    parser.add_argument("-p", "--print", help="Print images before and after extraction",
+                        action='store_true', default=None)
+    parser.add_argument("-e", "--extract", type=int, choices=[0, 1, 2, 3, 4, 5],
+                        help="specify feature extract algorithm (0 is no extraction)", default=0)
+
     args = vars(parser.parse_args())
 
     algorithms = [Perceptron, BayesClassifier, CustomClassifier, BasicClassifier, PerfectClassifier]
@@ -74,6 +98,10 @@ def main():
     algorithm = args["algorithm"]
     datasource = args["data"]
     csv = args["csv"]
+    print_extract = args["print"]
+    extract = args["extract"]
+
+    extract = [no_extract, basic_feature_extractor, digit_extractor1][extract]
 
     datapoints = {}
 
@@ -85,8 +113,8 @@ def main():
 
     elif full_eval:
         # full evaluation
-        faces = face_datasets()
-        digits = digit_datasets()
+        faces = face_datasets(extract, print_extract)
+        digits = digit_datasets(extract, print_extract)
         # run all algorithms on both faces and digits
         for alg in algorithms:
             data = run_test(faces, alg([0, 1]))
@@ -109,7 +137,7 @@ def main():
     else:
         # both algorithm and data set is provided
         # get correct dataset and labels
-        data = {"face": face_datasets, "digit": digit_datasets}[datasource]()
+        data = {"face": face_datasets, "digit": digit_datasets}[datasource](extract, print_extract)
         labels = {"face": [0, 1], "digit": list(range(0, 10))}[datasource]
         # get specific algorithm
         algorithm = algorithms[algorithm-1](labels)
