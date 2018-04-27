@@ -6,7 +6,7 @@ import numpy as np
 class BayesClassifier(Classifier):
     def __init__(self, legal_labels):
         super().__init__(legal_labels)
-        self.model = nb()
+        self.model = nb(20, fit_prior=False)
 
     @staticmethod
     def name():

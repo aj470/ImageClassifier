@@ -82,21 +82,73 @@ def check_surrounding(image, x, y, checklist=None):
     return total
 
 
-def shu_edge_thinning(image):
+def sobel_edge_detect(image):
+    output = []
+    gradient = []
     # sobel edge detection
-    sobel = []
-    for y in range(image.height()):
-        line = []
-        for x in range(image.width()):
-                ex = image.get_pixel(x+1, y-1) + 2*image.get_pixel(x+1, y) + image.get_pixel(x+1, y+1) \
-                    - image.get_pixel(x-1, y-1) - 2*image.get_pixel(x-1, y) - image.get_pixel(x-1, y+1)
-                ey = image.get_pixel(x - 1, y + 1) + 2 * image.get_pixel(x, y + 1) + image.get_pixel(x + 1, y + 1) \
-                    - image.get_pixel(x - 1, y - 1) - 2 * image.get_pixel(x, y - 1) - image.get_pixel(x + 1, y - 1)
-                line.append(math.sqrt(ex**2 + ey**2))
-        sobel.append(line)
+    for y in range(1, image.height() - 1):
+        outline = []
+        gradline = []
+        for x in range(1, image.width() - 1):
+            ex = 0
+            ey = 0
+            # top left
+            p = image.get_pixel(x - 1, y - 1)
+            ex -= p
+            ey -= p
+            # bottom left
+            p = image.get_pixel(x - 1, y + 1)
+            ex -= p
+            ey += p
+            # top right
+            p = image.get_pixel(x + 1, y - 1)
+            ex += p
+            ey -= p
+            # bottom right
+            p = image.get_pixel(x + 1, y + 1)
+            ex += p
+            ey += p
+            # left and right
+            p = image.get_pixel(x - 1, y)
+            ex -= 2 * p
+            p = image.get_pixel(x + 1, y)
+            ex += 2 * p
+            # top and bottom
+            p = image.get_pixel(x, y - 1)
+            ey -= 2 * p
+            p = image.get_pixel(x, y + 1)
+            ey += 2 * p
 
+            ee = math.sqrt(ex**2 + ey**2)
+            # normalize length
+            ee = int(ee / 4328 * 255)
+            ed = int(math.degrees(math.atan2(ey, ex)))
+            if ed < 0:
+                # get the inverse angle
+                ed = 180 + ed
+            # round to one of 4 directions
+            if -22.5 <= ed < 22.5:
+                ed = 0
+            elif 22.5 <= ed < 67.5:
+                ed = 45
+            elif 67.5 <= ed < 112.5:
+                ed = 90
+            elif 112.5 <= ed <= 157.5:
+                ed = 135
+            else:
+                ed = 0
+
+            outline.append(ee)
+            gradline.append(ed)
+        output.append(outline)
+        gradient.append(gradline)
+
+    return output, gradient
+
+
+def shu_edge_thinning(image):
+    sobel, gradient = sobel_edge_detect(image)
     sobel = Datum(sobel)
-
     # thinning using shu-edge thinning
     thinned = []
     for y in range(image.height()):
@@ -112,6 +164,40 @@ def shu_edge_thinning(image):
                 ex = 0
                 en = math.sqrt(ex**2 + ey**2)
 
-            line.append(min(en, 1))
+            line.append(min(en, 255))
         thinned.append(line)
     return Datum(thinned)
+
+
+def non_maximum_suppression(image):
+    sobel, gradient = sobel_edge_detect(image)
+
+    for y in range(1, image.height()-3):
+        for x in range(1, image.width()-3):
+            direction = gradient[y][x]
+            pixel = image.get_pixel(x, y)
+            if direction == 0:
+                # check left and right
+                if pixel > image.get_pixel(x-1, y) and pixel > image.get_pixel(x+1, y):
+                    sobel[y][x] = 255
+                else:
+                    sobel[y][x] = 0
+            elif direction == 45:
+                # check bottom left and top right
+                if pixel > image.get_pixel(x-1, y+1) and pixel > image.get_pixel(x+1, y-1):
+                    sobel[y][x] = 255
+                else:
+                    sobel[y][x] = 0
+            elif direction == 90:
+                # check up and down
+                if pixel > image.get_pixel(x, y+1) and pixel > image.get_pixel(x, y-1):
+                    sobel[y][x] = 255
+                else:
+                    sobel[y][x] = 0
+            else:
+                # check top left and bottom right
+                if pixel > image.get_pixel(x+1, y+1) and pixel > image.get_pixel(x-1, y-1):
+                    sobel[y][x] = 255
+                else:
+                    sobel[y][x] = 0
+    return Datum(sobel)

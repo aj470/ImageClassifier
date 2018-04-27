@@ -29,7 +29,7 @@ class Dataset:
             self._images[i] = extractor(self._images[i])
 
     def get_images(self):
-        return self._images.copy()
+        return [images.Datum(img.data()) for img in self._images]
 
     def get_labels(self):
         return self._labels.copy()

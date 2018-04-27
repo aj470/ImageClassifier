@@ -12,7 +12,7 @@ class Datum:
         return len(self._data)
 
     def data(self):
-        return self._data.copy()
+        return [[p for p in l] for l in self._data]
 
     def flat_data(self):
         return [pixel for line in self._data for pixel in line]
@@ -29,7 +29,7 @@ class Datum:
             for pixel in line:
                 if pixel == 0:
                     print(" ", end="")
-                elif 0 < pixel < 1:
+                elif 0 < pixel < 255:
                     print("+", end="")
                 else:
                     print("#", end="")
@@ -46,9 +46,9 @@ def ascii2float(char):
     if char == ' ':
         return 0
     elif char == '+':
-        return 0.5
+        return 127
     elif char == '#':
-        return 1
+        return 255
     else:
         raise ValueError("Invalid character in data file")
 
