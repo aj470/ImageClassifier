@@ -1,3 +1,5 @@
+import math
+
 from images import Datum
 
 # dimensions in characters
@@ -78,3 +80,38 @@ def check_surrounding(image, x, y, checklist=None):
         if image[y+1][x] == 0.5:
             total += check_surrounding(image, x, y+1, checklist)
     return total
+
+
+def shu_edge_thinning(image):
+    # sobel edge detection
+    sobel = []
+    for y in range(image.height()):
+        line = []
+        for x in range(image.width()):
+                ex = image.get_pixel(x+1, y-1) + 2*image.get_pixel(x+1, y) + image.get_pixel(x+1, y+1) \
+                    - image.get_pixel(x-1, y-1) - 2*image.get_pixel(x-1, y) - image.get_pixel(x-1, y+1)
+                ey = image.get_pixel(x - 1, y + 1) + 2 * image.get_pixel(x, y + 1) + image.get_pixel(x + 1, y + 1) \
+                    - image.get_pixel(x - 1, y - 1) - 2 * image.get_pixel(x, y - 1) - image.get_pixel(x + 1, y - 1)
+                line.append(math.sqrt(ex**2 + ey**2))
+        sobel.append(line)
+
+    sobel = Datum(sobel)
+
+    # thinning using shu-edge thinning
+    thinned = []
+    for y in range(image.height()):
+        line = []
+        for x in range(image.width()):
+            ex = sobel.get_pixel(x-1, y) + sobel.get_pixel(x, y) + sobel.get_pixel(x+1, y)
+            ey = 0
+            if sobel.get_pixel(x, y) >= sobel.get_pixel(x, y-1) and sobel.get_pixel(x, y) >= sobel.get_pixel(x, y+1):
+                ey = sobel.get_pixel(x, y-1) + sobel.get_pixel(x, y) + sobel.get_pixel(x, y+1)
+
+            en = math.sqrt(ex**2 + ey**2)
+            if en < sobel.get_pixel(x-1, y) or sobel.get_pixel(x, y) < sobel.get_pixel(x+1, y):
+                ex = 0
+                en = math.sqrt(ex**2 + ey**2)
+
+            line.append(min(en, 1))
+        thinned.append(line)
+    return Datum(thinned)

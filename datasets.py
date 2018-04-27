@@ -24,6 +24,8 @@ class Dataset:
 
     def extract(self, extractor):
         for i in range(len(self._images)):
+            if (i % 100) == 0:
+                print(i)
             self._images[i] = extractor(self._images[i])
 
     def get_images(self):

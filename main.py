@@ -101,7 +101,7 @@ def main():
     print_extract = args["print"]
     extract = args["extract"]
 
-    extract = [no_extract, basic_feature_extractor, digit_extractor1][extract]
+    extract = [no_extract, basic_feature_extractor, digit_extractor1, shu_edge_thinning][extract]
 
     datapoints = {}
 

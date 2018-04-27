@@ -5,6 +5,12 @@ class Datum:
         self._data = data
         self._value = 0
 
+    def width(self):
+        return len(self._data[0])
+
+    def height(self):
+        return len(self._data)
+
     def data(self):
         return self._data.copy()
 
@@ -12,6 +18,10 @@ class Datum:
         return [pixel for line in self._data for pixel in line]
 
     def get_pixel(self, x, y):
+        if y < 0 or y >= self.height():
+            return 0
+        if x < 0 or x >= self.width():
+            return 0
         return self._data[y][x]
 
     def print(self):
