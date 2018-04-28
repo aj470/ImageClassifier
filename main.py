@@ -9,6 +9,8 @@ from classifier import *
 
 # dimensions in characters
 # widths aren't used
+from images import Datum
+
 FACE_WIDTH = 60
 FACE_HEIGHT = 70
 
@@ -34,16 +36,29 @@ def digit_datasets():
     ]
 
 
+def basic_feature_extractor(image):
+    image = image.data()
+    for y in range(len(image)):
+        for x in range(len(image[y])):
+            if image[y][x] > 0:
+                image[y][x] = 1
+    return Datum(image)
+
+
 def run_test(datasets, algorithm):
     training, validation, test, dataname = datasets
     percentages = map(lambda x: x/10, range(1, 11))
+
+    training.extract(basic_feature_extractor)
+    validation.extract(basic_feature_extractor)
+    test.extract(basic_feature_extractor)
 
     datapoints = []
     for percent in percentages:
         count = int(percent * len(training))
         training_set = training.subset(count)
-        start_time = monotonic()
         print(count)
+        start_time = monotonic()
         algorithm.train(training_set, validation)
         end_time = monotonic()
 
