@@ -44,7 +44,7 @@ class BayesClassifier(Classifier):
         # occurrences of that features in said class throughout all training data
         feature_counts = np.log(self.feature_sums + alpha)
         # number of samples belonging to each class
-        class_counts = np.log(self.class_sums + 2 * alpha).reshape(-1, 1)
+        class_counts = np.log(self.class_sums + len(self.class_sums) * alpha).reshape(-1, 1)
         # compute (# of feature occurrences) / (# of possible occurrences) to get probability of feature per class
         self.log_params = feature_counts - class_counts
         # q array = (1 - p)
@@ -53,10 +53,25 @@ class BayesClassifier(Classifier):
     def train(self, training_data, validation_data):
         """Must return the final percentage accuracy achieved on validation data set."""
         self._count(training_data.get_labeled_images())
-        alpha = 0
-        delta = 5
-        iterations = 10
-        self._smooth(1)
+        # alpha = 1
+        # delta = 5
+        # iterations = 10
+        # prev_accuracy = 0
+        # best_accuracy = 0
+        best_alpha = 1
+        # for i in range(iterations):
+        #    print(alpha)
+        #    self._smooth(alpha)
+        #    accuracy = self.validate(validation_data)
+        #    if accuracy > best_accuracy:
+        #        best_accuracy = accuracy
+        #        best_alpha = alpha
+        #    elif accuracy < prev_accuracy:
+        #        delta = - delta / 2
+        #    prev_accuracy = accuracy
+        #    alpha = max(1, alpha + delta)
+        # print("Using alpha: ", best_alpha)
+        self._smooth(best_alpha)
         return self.validate(validation_data)
 
     def classify(self, data):
@@ -75,5 +90,6 @@ class BayesClassifier(Classifier):
             # P(f1...fn | C) = P(f1 | C) * P(f2 | C) * P(f3 | C) * ... * P(fn | C)
             # since they are log probabilities, we can simply add them
             class_probabilities = class_probabilities.sum(axis=1)
+            # get max probability, and add the corresponding class to the list of guesses
             guesses.append(self.classes[class_probabilities.argmax()])
         return guesses
