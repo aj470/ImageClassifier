@@ -74,7 +74,7 @@ class BayesClassifier(Classifier):
                 probabilities[cls] = 1
                 # calculate P(f1 | C) * P(f2 | C) * P(f3 | C) ... * P(fn | C)
                 # by calculating p * vector (probability of '1' features occurring) + q * inverse (probability of '0' features occurring)
-                probabilities[cls] *= np.prod((params["p"] * vector) + (params["q"] * inverse))
+                probabilities[cls] *= np.log((params["p"] * vector) + (params["q"] * inverse)).sum()
             # get the highest guess
             guesses.append(max(probabilities.items(), key=lambda x: x[1])[0])
         return guesses
