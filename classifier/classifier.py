@@ -1,19 +1,3 @@
-from images import Datum
-
-
-def basic_feature_extractor(image):
-    newImage = []
-    image = image.data()
-    for line in image:
-        newLine = []
-        for pixel in line:
-            if pixel > 0:
-                newLine.append(1)
-            else:
-                newLine.append(0)
-        newImage.append(newLine)
-        newLine = []
-    return Datum(newImage)
 
 
 class Classifier:
