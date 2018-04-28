@@ -58,7 +58,7 @@ class BayesClassifier(Classifier):
             inverse = 1 - vector
             for cls, params in self.class_parameters.items():
                 probabilities[cls] = self.priors[cls]
-                probabilities[cls] *= np.dot(params["p"], vector) * np.dot(params["q"], inverse)
+                probabilities[cls] *= np.prod((params["p"] * vector) + (params["q"] * inverse))
 
             guesses.append(max(probabilities.items(), key=lambda x: x[1])[0])
         return guesses
