@@ -1,5 +1,7 @@
 from .classifier import *
-
+import numpy as np
+import util
+PRINT = true
 
 class Perceptron(Classifier):
     @staticmethod
