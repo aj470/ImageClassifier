@@ -46,7 +46,7 @@ class BayesClassifier(Classifier):
             # go through each feature and convert it to a probability
             for i in range(dimension):
                 # => number of occurrences of feature / maximum possible number of occurrences (+ alpha adjustments)
-                sums[i] = (sums[i] + alpha) / (len(images) + alpha)
+                sums[i] = (sums[i] + alpha) / (len(images) + 2 * alpha)
 
             # convert to array
             sums = np.array(sums)
