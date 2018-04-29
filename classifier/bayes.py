@@ -52,26 +52,36 @@ class BayesClassifier(Classifier):
 
     def train(self, training_data, validation_data):
         """Must return the final percentage accuracy achieved on validation data set."""
-        self._count(training_data.get_labeled_images())
-        # alpha = 1
-        # delta = 5
-        # iterations = 10
-        # prev_accuracy = 0
-        # best_accuracy = 0
-        best_alpha = 1
-        # for i in range(iterations):
-        #    print(alpha)
-        #    self._smooth(alpha)
-        #    accuracy = self.validate(validation_data)
-        #    if accuracy > best_accuracy:
-        #        best_accuracy = accuracy
-        #        best_alpha = alpha
-        #    elif accuracy < prev_accuracy:
-        #        delta = - delta / 2
-        #    prev_accuracy = accuracy
-        #    alpha = max(1, alpha + delta)
-        # print("Using alpha: ", best_alpha)
-        self._smooth(best_alpha)
+        classes = self._separate(training_data.get_labeled_images())
+        total_size = len(training_data)
+        alpha = 1
+        # iterate through each possible class
+        for cls in classes:
+            images = classes[cls]               # images assigned to each class
+            flat_images = tuple(map(lambda x: x.flat_data(), images))  # flat images
+            dimension = len(flat_images[0])     # number of features
+            sums = [0]*dimension                # array of feature sums
+
+            for img in flat_images:
+                # for each image, go through each feature
+                for i in range(dimension):
+                    # increment counter of this feature if feature is non-zero
+                    if img[i] > 0:
+                        sums[i] += 1
+
+            # go through each feature and convert it to a probability
+            for i in range(dimension):
+                # => number of occurrences of feature / maximum possible number of occurrences (+ alpha adjustments)
+                sums[i] = (sums[i] + alpha) / (len(images) + 2 * alpha)
+
+            # convert to array
+            sums = np.array(sums)
+            # store p and q arrays:
+            # probability of feature being present in this class, and probability of it not being present
+            self.class_parameters[cls] = {"p": sums, "q": 1 - sums}
+            # set prior - number of occurrences of this class in relation to size of dataset
+            self.priors[cls] = len(images) / total_size
+
         return self.validate(validation_data)
 
     def classify(self, data):
@@ -79,17 +89,20 @@ class BayesClassifier(Classifier):
         images = np.array([img.flat_data() for img in data.get_images()])
 
         guesses = []
-        for image in images:
-            inverse_img = 1 - image
-            # image * log_params calculates P(f[i] = 1 | C)
-            # inverse_img * inverse_log_params calculates P(f[i] = 0 | C)
-            # adding these two arrays results in P(f[i] | C) for all i in f
-            class_probabilities = inverse_img * self.inverse_log_params + image * self.log_params
-            # The sum of P(f[i:n] | C) is equal to the probability that x belongs to C
-            # P(C | f1...fn) ~~ P(f1...fn | C) * P(C)
-            # P(f1...fn | C) = P(f1 | C) * P(f2 | C) * P(f3 | C) * ... * P(fn | C)
-            # since they are log probabilities, we can simply add them
-            class_probabilities = class_probabilities.sum(axis=1)
-            # get max probability, and add the corresponding class to the list of guesses
-            guesses.append(self.classes[class_probabilities.argmax()])
+        for image, label in data.get_labeled_images():
+            # get flat image == feature vector
+            vector = image.flat_data()
+            probabilities = {}
+            # convert it to an np array
+            vector = np.array(vector)
+            # calculate inverse => 0's become 1's and 1's become 0's
+            inverse = 1 - vector
+            for cls, params in self.class_parameters.items():
+                # uniform prior works slightly better than actual prior => dataset is roughly uniformly distributed
+                probabilities[cls] = 1
+                # calculate P(f1 | C) * P(f2 | C) * P(f3 | C) ... * P(fn | C)
+                # by calculating p * vector (probability of '1' features occurring) + q * inverse (probability of '0' features occurring)
+                probabilities[cls] *= np.log((params["p"] * vector) + (params["q"] * inverse)).sum()
+            # get the highest guess
+            guesses.append(max(probabilities.items(), key=lambda x: x[1])[0])
         return guesses
