@@ -6,49 +6,20 @@ from .classifier import *
 class BayesClassifier(Classifier):
     def __init__(self, legal_labels):
         """Bayes classifier for Bernoulli distributions"""
-        super().__init__(legal_labels)
-        self.log_params = None
-        self.inverse_log_params = None
-        self.feature_sums = None
-        self.class_sums = None
-        self.classes = None
-        self.priors = None
+        self.priors = {}
+        self.class_parameters = {}
 
     @staticmethod
     def name():
         return "bayes"
 
-    def _count(self, dataset):
-        # dict mapping classes to lists of images
+    def _separate(self, dataset):
         classes = {}
-        for img, cls in dataset:
+        for data, cls in dataset:
             if cls not in classes:
-                # if class is not already in dict, add it
                 classes[cls] = []
-            classes[cls].append(img.flat_data())
-
-        # one dimensional array of classes
-        self.classes = np.array(list(classes.keys()))
-        # class_images is a list -- each element is the set of images belonging to a corresponding class
-        # it would be a matrix, but classes may not (most likely don't) have equal number of images.
-        class_images = [np.array([image for image in classes[cls]]) for cls in self.classes]
-        # sum features present per class
-        self.feature_sums = np.array([imgs.sum(axis=0) for imgs in class_images])
-        # number of items belonging to each class
-        self.class_sums = np.array([len(arr) for arr in classes.values()])
-        # calculate priors (% of the time a class occurred in dataset)
-        self.priors = np.log(self.class_sums) - np.log(self.class_sums.sum())
-
-    def _smooth(self, alpha):
-        # feature counts is not a 2D array, each row representing a class, each element representing the number of
-        # occurrences of that features in said class throughout all training data
-        feature_counts = np.log(self.feature_sums + alpha)
-        # number of samples belonging to each class
-        class_counts = np.log(self.class_sums + len(self.class_sums) * alpha).reshape(-1, 1)
-        # compute (# of feature occurrences) / (# of possible occurrences) to get probability of feature per class
-        self.log_params = feature_counts - class_counts
-        # q array = (1 - p)
-        self.inverse_log_params = np.log(1 - np.exp(self.log_params))
+            classes[cls].append(data)
+        return classes
 
     def train(self, training_data, validation_data):
         """Must return the final percentage accuracy achieved on validation data set."""
