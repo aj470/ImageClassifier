@@ -1,4 +1,5 @@
 from .classifier import *
+import random
 import numpy as np
 import util
 PRINT = true
@@ -25,7 +26,8 @@ class Perceptron(Classifier):
 		featuresWeights = []
 
 		"*** YOUR CODE HERE ***"
-		featuresWeights = self.weights[label].sortedKeys()[:100]
+		featuresList = self.weights[label]
+		featuresWeights = featuresList.sortedKeys()[:100] #sort by values and then retrieve the top 100 features we want
 		return featuresWeights		
       
     def train(self, training_data, validation_data):
