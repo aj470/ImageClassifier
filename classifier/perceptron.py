@@ -4,14 +4,32 @@ import numpy as np
 import util
 PRINT = true
 
+""" 
+We know the following:
+digit width = 28
+digit height = 28
+face width = 60
+face height = 70
+"""
+
 class Perceptron(Classifier):
-	def __init__(self, legal_labels):
+	def __init__(self, legal_labels, max_iterations):
 		self.legal_labels = legal_labels
 		self.type = "perceptron"
+		self.max_iterations = max_iterations
 		self.weights = {} 
 		for label in legal_labels:
 			self.weights[label].util.Counter()
-    @staticmethod
+		#Initialize Random Weights 
+		if(digit):
+			for column in range(28):  #height 
+				for row in range(28): #width
+					self.weights[label][(column,row)] = random.uniform(0,1)
+		else: #face
+			for column in range(70):  #height
+				for row in range(60): #width
+					self.weights[label][(column,row)] = random.uniform(0,1)
+	@staticmethod
     def name():
         return "perceptron"
 		
@@ -30,7 +48,7 @@ class Perceptron(Classifier):
 		featuresWeights = featuresList.sortedKeys()[:100] #sort by values and then retrieve the top 100 features we want
 		return featuresWeights		
       
-    def train(self, training_data, validation_data):
+    def train(self, training_data, training_labels, validation_data, validation_labels):
         """Must return the final percentage accuracy achieved on validation data set."""
         raise NotImplemented()
 
