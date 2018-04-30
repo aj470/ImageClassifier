@@ -20,6 +20,7 @@ class Perceptron(Classifier):
 		self.weights = {} 
 		for label in legal_labels:
 			self.weights[label].util.Counter()
+		digit = True if len(legal_labels) == 10 else False
 		#Initialize Random Weights 
 		if(digit):
 			for column in range(28):  #height 
@@ -44,13 +45,15 @@ class Perceptron(Classifier):
 		featuresWeights = []
 
 		"*** YOUR CODE HERE ***"
+		top_amount = 100
 		featuresList = self.weights[label]
-		featuresWeights = featuresList.sortedKeys()[:100] #sort by values and then retrieve the top 100 features we want
+		featuresWeights = featuresList.sortedKeys()[:top_amount] #sort by values and then retrieve the top 100 features we want
 		return featuresWeights		
       
     def train(self, training_data, training_labels, validation_data, validation_labels):
         """Must return the final percentage accuracy achieved on validation data set."""
-        raise NotImplemented()
+        self.features = training_data[0].keys() #could be useful later
+		
 
 	def classify(self, data ):
 		"""
