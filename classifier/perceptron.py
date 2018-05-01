@@ -61,7 +61,7 @@ class Perceptron(Classifier):
 		while i < len(self.legalLabels):
 			tempScore = self.findScore(counter, self.legalLabels[i])
 			if tempScore < maxScore:
-				continue
+				pass
 			else:
 				maxScore = tempScore
 				maxScoreLabel = self.legalLabels[i]
@@ -84,7 +84,7 @@ class Perceptron(Classifier):
 					self.weights[training_label] = self.weights[training_label] + training_datum
 					self.weights[temp_label] = self.weights[temp_label] - training_datum					  
 
-	def classify(self, data ):
+	def classify(self, data):
 		"""
 		Classifies each datum as the label that most closely matches the prototype vector
 		for that label.  See the project description for details.
