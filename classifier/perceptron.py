@@ -30,10 +30,7 @@ class Perceptron(Classifier):
 			for column in range(70):  #height
 				for row in range(60): #width
 					self.weights[label][(column,row)] = random.uniform(0,1)
-	@staticmethod
-    def name():
-        return "perceptron"
-		
+	
 	def setWeights(self, weights):
 		assert len(weights) == len(self.legalLabels);
 		self.weights == weights;
@@ -50,7 +47,7 @@ class Perceptron(Classifier):
 		featuresWeights = featuresList.sortedKeys()[:top_amount] #sort by values and then retrieve the top 100 features we want
 		return featuresWeights		
 		
-    def findScore(self, featureList, label): #calculates score for label
+	def findScore(self, featureList, label): #calculates score for label
 		score = featureList*self.weights[label]
 		return score
 		
@@ -68,13 +65,13 @@ class Perceptron(Classifier):
 			i += 1
 		return maxScoreLabel
 		
-    def train(self, training_data, training_labels, validation_data, validation_labels):
-        """Must return the final percentage accuracy achieved on validation data set."""
-        self.features = training_data[0].keys() #could be useful later
+	def train(self, training_data, training_labels, validation_data, validation_labels):
+		"""Must return the final percentage accuracy achieved on validation data set."""
+		self.features = training_data[0].keys() #could be useful later
 		for iteration in range(self.max_iterations):
-			  print "Starting iteration ", iteration, "..."
-			  indices = [i for i in range(len(training_data))]
-			  while len(indices) > 0:
+			print("Starting iteration ", iteration, "...")
+			indices = [i for i in range(len(training_data))]
+			while len(indices) > 0:
 				datum_index = random.choice(indicies)
 				indices.remove(datum_index)
 				training_datum = training_data[datum_index]
