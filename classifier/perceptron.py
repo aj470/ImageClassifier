@@ -53,7 +53,11 @@ class Perceptron(Classifier):
     def train(self, training_data, training_labels, validation_data, validation_labels):
         """Must return the final percentage accuracy achieved on validation data set."""
         self.features = training_data[0].keys() #could be useful later
-		
+		for iteration in range(self.max_iterations):
+			  print "Starting iteration ", iteration, "..."
+			  for i in range(len(training_data)):
+				  "*** YOUR CODE HERE ***"
+				  datum = training_data[i]
 
 	def classify(self, data ):
 		"""
