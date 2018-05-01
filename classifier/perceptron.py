@@ -57,13 +57,15 @@ class Perceptron(Classifier):
 	def findMaxScore(self, counter):
 		maxScoreLabel = self.legalLabels[0]
 		maxScore = self.findScore(counter, self.legalLabels[0])
-		for i in range(1, len(self.legalLabels)):
-			temp_score = self.findScore(counter, self.legalLabels[i])
-			if temp_score < maxScore:
+		i = 1
+		while i < len(self.legalLabels):
+			tempScore = self.findScore(counter, self.legalLabels[i])
+			if tempScore < maxScore:
 				continue
 			else:
-				maxScore = temp_score
+				maxScore = tempScore
 				maxScoreLabel = self.legalLabels[i]
+			i += 1
 		return maxScoreLabel
 		
     def train(self, training_data, training_labels, validation_data, validation_labels):
@@ -71,9 +73,16 @@ class Perceptron(Classifier):
         self.features = training_data[0].keys() #could be useful later
 		for iteration in range(self.max_iterations):
 			  print "Starting iteration ", iteration, "..."
-			  for i in range(len(training_data)):
-				  "*** YOUR CODE HERE ***"
-				  datum = training_data[i]
+			  indices = [i for i in range(len(training_data))]
+			  while len(indices) > 0:
+				datum_index = random.choice(indicies)
+				indices.remove(datum_index)
+				training_datum = training_data[datum_index]
+				training_label = training_labels[datum_index]
+				temp_label = self.findMaxScore(training_datum)
+				if(temp_label != training_label):
+					self.weights[training_label] = self.weights[training_label] + training_datum
+					self.weights[temp_label] = self.weights[temp_label] - training_datum					  
 
 	def classify(self, data ):
 		"""
