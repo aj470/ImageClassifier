@@ -49,7 +49,23 @@ class Perceptron(Classifier):
 		featuresList = self.weights[label]
 		featuresWeights = featuresList.sortedKeys()[:top_amount] #sort by values and then retrieve the top 100 features we want
 		return featuresWeights		
-      
+		
+    def findScore(self, featureList, label): #calculates score for label
+		score = featureList*self.weights[label]
+		return score
+		
+	def findMaxScore(self, counter):
+		maxScoreLabel = self.legalLabels[0]
+		maxScore = self.findScore(counter, self.legalLabels[0])
+		for i in range(1, len(self.legalLabels)):
+			temp_score = self.findScore(counter, self.legalLabels[i])
+			if temp_score < maxScore:
+				continue
+			else:
+				maxScore = temp_score
+				maxScoreLabel = self.legalLabels[i]
+		return maxScoreLabel
+		
     def train(self, training_data, training_labels, validation_data, validation_labels):
         """Must return the final percentage accuracy achieved on validation data set."""
         self.features = training_data[0].keys() #could be useful later
