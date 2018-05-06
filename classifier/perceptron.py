@@ -34,7 +34,7 @@ class Perceptron(Classifier):
 
     def setWeights(self, weights):
         assert len(weights) == len(self.legalLabels)
-        self.weights = weights
+        self.weights == weights
 
     def findHighWeightFeatures(self, label):
         """
@@ -49,16 +49,16 @@ class Perceptron(Classifier):
                           :top_amount]  # sort by values and then retrieve the top 100 features we want
         return featuresWeights
 
-    def findScore(self, featureList, label):  # calculates score for label
-        score = featureList * self.weights[label]
+    def findScore(self, featureList, get_label):  # calculates score for label
+        score = featureList * self.weights[get_label]
         return score
 
-    def findMaxScore(self, counter):
+    def findMaxScore(self, mydatum):
         maxScoreLabel = self.legalLabels[0]
-        maxScore = self.findScore(counter, self.legalLabels[0])
+        maxScore = self.findScore(mydatum, self.legalLabels[0])
         i = 1
         while i < len(self.legalLabels):
-            tempScore = self.findScore(counter, self.legalLabels[i])
+            tempScore = self.findScore(mydatum, self.legalLabels[i])
             if tempScore < maxScore:
                 pass
             else:
