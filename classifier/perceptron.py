@@ -16,7 +16,10 @@ from .util import Counter
 import random
 import numpy as np
 
+
 """ 
+00 01 02 03
+10 11 12 13
 We know the following:
 digit width = 28
 digit height = 28
@@ -41,13 +44,17 @@ class Perceptron(Classifier):
             self.weights[label] = Counter()
             # Initialize Random Weights
             if digit:
-                for column in range(28):  # height
-                    for row in range(28):  # width
-                        self.weights[label][(column, row)] = random.uniform(0, 1)
+                self.height = 28
+                self.width = 28
+                for row in range(self.height):  # height
+                    for column in range(self.width):  # width
+                        self.weights[label][(row, column)] = random.uniform(0, 1)
             else:  # face
-                for column in range(70):  # height
-                    for row in range(60):  # width
-                        self.weights[label][(column, row)] = random.uniform(0, 1)
+                self.height = 70
+                self.width = 60
+                for row in range(self.height):  # height
+                    for column in range(self.width):  # width
+                        self.weights[label][(row, column)] = random.uniform(0, 1)
                         
     @staticmethod
     def name():
@@ -85,6 +92,7 @@ class Perceptron(Classifier):
             flat_images = tuple(map(lambda x: x.flat_data(), images))
             for image in flat_images: 
                 training_data[k] = image
+                k +=1
                 training_target.append(cls)
         training_target = np.array(training_target, dtype=np.int32)
 
@@ -96,34 +104,36 @@ class Perceptron(Classifier):
         for iteration in range(self.max_iterations):
             print("Starting iteration ", iteration, "...")
             for i in range(len(training_data)):
+                #print("here")
+                image_counter = Counter()
+                count = 0
+                for row in range(self.height):
+                    for column in range(self.width):
+                        image_counter[(row,column)] = training_data[i][count]
+                        count += 1
                 for l in self.legalLabels:
-                    #print(self.weights[l])
-                    lab[l] = self.weights[l].__mul__(training_data[i])
-                    #print(lab)
-                values = list(lab.values())
-                index = values.index(max(values,key= values.count))
-                keys = list(lab.keys())
-                print(lab)
-                print(values)
-                print(index)
+                    lab[l] = self.weights[l].__mul__(image_counter)
+                    
+                values = list(lab.values()) 
+                keys = list(lab.keys()) 
+                index = values.index(max(values))
+                #print("lab", lab)
+                #print(values)
+                ##print(index)
+                #print(training_target[i])
  				
-                if not(training_target[i] == keys[index]):
+                if training_target[i] != keys[index]:
                     image_counter = Counter()
                     count = 0
-                    for column in range(28):
-                        for row in range(28):
+                    for row in range(self.height):
+                        for column in range(self.width):
                             self.weights[training_target[i]][(row,column)] += training_data[i][count]
                             self.weights[keys[index]][(row,column)] -= training_data[i][count]
                             count += 1
                     #print(image_counter)
                     #self.weights[training_target[i]].__radd__(image_counter)
                     #self.weights[keys[index]].__sub__(image_counter)
-                    print(self.weights[training_target[i]])                 
-                    print(self.weights[training_target[i]][(0,0)])		
-                    print(training_target[i])
-                    print(keys[index])
                     #self.weights[training_target[i]] += image_counter
-                    print(self.weights[training_target[i]])
                     #self.weights[keys[index]] -= image_counter
         return self.validate(validation_data)   					
     def classify(self, data ):
@@ -139,22 +149,22 @@ class Perceptron(Classifier):
             image_counter = Counter()
             flat_img = image.flat_data()
             count = 0
-            for column in range(28):
-                for row in range(28):
+            for row in range(self.height):
+                for column in range(self.width):
                     #image_counter[(column, row)] = image.flat_data()[count]
-                    image_counter[(column, row)] = flat_img[count]
+                    image_counter[(row, column)] = flat_img[count]
                     count += 1
             for l in self.legalLabels:
                 vectors[l] = self.weights[l] * image_counter
-                print(vectors[l])
-            print("vector", vectors)
+                #print(vectors[l])
+            #print("vector", vectors)
             values = list(vectors.values()) 
             keys = list(vectors.keys()) 
             index = values.index(max(values)) 
             guesses.append(keys[index])
-            print(keys[index])
-        print("here")
-        print(guesses)
+            #print(keys[index])
+        #print("here")
+        #print(guesses)
         return guesses
 
 
