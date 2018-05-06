@@ -54,8 +54,8 @@ class Perceptron(Classifier):
         return "perceptron"
         
     def setWeights(self, weights):
-        assert len(weights) == len(self.legalLabels)
-        self.weights = weights
+        assert len(weights) == len(self.legalLabels);
+        self.weights = weights;
 
     def _separate(self, dataset):
         classes = {}
@@ -97,28 +97,36 @@ class Perceptron(Classifier):
             print("Starting iteration ", iteration, "...")
             for i in range(len(training_data)):
                 for l in self.legalLabels:
-                    print(self.weights[l])
+                    #print(self.weights[l])
                     lab[l] = self.weights[l].__mul__(training_data[i])
-                    #print(lab[l])
+                    #print(lab)
                 values = list(lab.values())
-                index = values.index(max(values, key=values.count))
+                index = values.index(max(values,key= values.count))
                 keys = list(lab.keys())
-                
+                print(lab)
+                print(values)
+                print(index)
+ 				
                 if not(training_target[i] == keys[index]):
                     image_counter = Counter()
                     count = 0
                     for column in range(28):
                         for row in range(28):
-                            image_counter[(column, row)] = training_data[i][count]
+                            self.weights[training_target[i]][(row,column)] += training_data[i][count]
+                            self.weights[keys[index]][(row,column)] -= training_data[i][count]
                             count += 1
                     #print(image_counter)
+                    #self.weights[training_target[i]].__radd__(image_counter)
+                    #self.weights[keys[index]].__sub__(image_counter)
+                    print(self.weights[training_target[i]])                 
+                    print(self.weights[training_target[i]][(0,0)])		
                     print(training_target[i])
                     print(keys[index])
-                    self.weights[training_target[i]] += image_counter
-                    self.weights[keys[index]] -= image_counter
-        return self.validate(validation_data)
-
-    def classify(self, data):
+                    #self.weights[training_target[i]] += image_counter
+                    print(self.weights[training_target[i]])
+                    #self.weights[keys[index]] -= image_counter
+        return self.validate(validation_data)   					
+    def classify(self, data ):
         """
         Classifies each datum as the label that most closely matches the prototype vector
         for that label.  See the project description for details.
@@ -133,14 +141,18 @@ class Perceptron(Classifier):
             count = 0
             for column in range(28):
                 for row in range(28):
+                    #image_counter[(column, row)] = image.flat_data()[count]
                     image_counter[(column, row)] = flat_img[count]
                     count += 1
             for l in self.legalLabels:
                 vectors[l] = self.weights[l] * image_counter
-            values = list(vectors.values())
-            index = values.index(max(values,key= values.count))
-            keys = list(vectors.keys())
+                print(vectors[l])
+            print("vector", vectors)
+            values = list(vectors.values()) 
+            keys = list(vectors.keys()) 
+            index = values.index(max(values)) 
             guesses.append(keys[index])
+            print(keys[index])
         print("here")
         print(guesses)
         return guesses
@@ -152,7 +164,5 @@ class Perceptron(Classifier):
         """
         featuresWeights = []
         featuresWeights = self.weights[label].values()
-        "*** YOUR CODE HERE ***"
-        #util.raiseNotDefined()
 
         return featuresWeights
