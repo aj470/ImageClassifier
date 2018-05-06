@@ -54,8 +54,8 @@ class Perceptron(Classifier):
         return "perceptron"
         
     def setWeights(self, weights):
-        assert len(weights) == len(self.legalLabels);
-        self.weights = weights;
+        assert len(weights) == len(self.legalLabels)
+        self.weights = weights
 
     def _separate(self, dataset):
         classes = {}
@@ -97,11 +97,11 @@ class Perceptron(Classifier):
             print("Starting iteration ", iteration, "...")
             for i in range(len(training_data)):
                 for l in self.legalLabels:
-                    #print(self.weights[l])
+                    print(self.weights[l])
                     lab[l] = self.weights[l].__mul__(training_data[i])
                     #print(lab[l])
                 values = list(lab.values())
-                index = values.index(max(values,key= values.count))
+                index = values.index(max(values, key=values.count))
                 keys = list(lab.keys())
                 
                 if not(training_target[i] == keys[index]):
@@ -112,10 +112,13 @@ class Perceptron(Classifier):
                             image_counter[(column, row)] = training_data[i][count]
                             count += 1
                     #print(image_counter)
-                    self.weights[training_target[i]].__radd__(image_counter)
-                    self.weights[keys[index]].__sub__(image_counter)	           
+                    print(training_target[i])
+                    print(keys[index])
+                    self.weights[training_target[i]] += image_counter
+                    self.weights[keys[index]] -= image_counter
+        return self.validate(validation_data)
 
-    def classify(self, data ):
+    def classify(self, data):
         """
         Classifies each datum as the label that most closely matches the prototype vector
         for that label.  See the project description for details.
@@ -126,10 +129,11 @@ class Perceptron(Classifier):
             #print(image.flat_data())
             vectors = Counter()
             image_counter = Counter()
+            flat_img = image.flat_data()
             count = 0
             for column in range(28):
                 for row in range(28):
-                    image_counter[(column, row)] = image.flat_data()[count]
+                    image_counter[(column, row)] = flat_img[count]
                     count += 1
             for l in self.legalLabels:
                 vectors[l] = self.weights[l] * image_counter
