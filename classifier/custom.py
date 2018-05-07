@@ -7,8 +7,8 @@ import matplotlib.patches as mpatches
 class CustomClassifier(Classifier):
     def __init__(self, legal_labels):
         """KNN Classifier"""
-        self.legal_labels = legal_labels
-        self.legal_labels_len = len(legal_labels)
+        self.legalLabels = legal_labels
+        self.legal_labels_len = len(self.legalLabels)
         self.training_dataset = []
         self.training_target = []
         self.training_examples = 0
@@ -79,7 +79,7 @@ class CustomClassifier(Classifier):
         
    
         
-        if len(self.legal_labels) > 2:
+        if len(self.legalLabels) > 2:
             k = [1,2,3,4,5,6,7,8,9,10]
         else:
             k = [x for x in range(int(training_examples/4),int(training_examples/2)) if x%20 == 0]
@@ -110,7 +110,7 @@ class CustomClassifier(Classifier):
         plt.title('knn Classifier')
         plt.savefig(str(training_examples)+'.pdf')
 
-        return 
+        return self.validate(validation_data)
 
     def classify(self, data):
         """Must return an array of predictions, each prediction corresponding to the image at that index."""
