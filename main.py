@@ -62,7 +62,7 @@ def run_test(datasets, algorithm):
         algorithm.train(training_set, validation)
         end_time = monotonic()
 
-        accuracy = algorithm.validate(test)
+        accuracy = algorithm.validate(test, print_distribution=True)
         datapoints.append((dataname, count, end_time - start_time, accuracy))
 
     return datapoints

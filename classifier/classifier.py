@@ -2,16 +2,34 @@
 
 class Classifier:
     def __init__(self, legal_labels):
-        self.legal_labels = legal_labels
+        self.legalLabels = legal_labels
 
     @staticmethod
     def name():
         raise NotImplemented()
 
-    def validate(self, validation_data):
+    def validate(self, validation_data, print_distribution=False):
         guesses = self.classify(validation_data)
-        pairs = zip(guesses, validation_data.get_labels())
+        pairs = tuple(zip(guesses, validation_data.get_labels()))
         num_correct = sum(map(lambda x: int(x[0] == x[1]), pairs))
+        distribution = [[0] * len(self.legalLabels) for i in range(len(self.legalLabels))]
+        for pair in pairs:
+            guess, answer = pair
+            distribution[answer][guess] += 1
+        if print_distribution:
+            print("label", end="")
+            sep = ""
+            for i in self.legalLabels:
+                print(sep + str(i), end="")
+                sep = ","
+            print()
+            for i in range(len(distribution)):
+                print(i, end=",")
+                sep = ""
+                for cnt in distribution[i]:
+                    print(sep + str(cnt), end="")
+                    sep = ","
+                print()
         return num_correct / len(validation_data)
 
     def train(self, training_data, validation_data):

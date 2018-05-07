@@ -6,6 +6,7 @@ from .classifier import *
 class BayesClassifier(Classifier):
     def __init__(self, legal_labels):
         """Bayes classifier for Bernoulli distributions"""
+        super().__init__(legal_labels)
         self.priors = {}
         self.class_parameters = {}
 
