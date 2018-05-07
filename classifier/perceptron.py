@@ -1,6 +1,7 @@
 from .classifier import *
 import random
 import numpy as np
+import math
 
 
 """ 
@@ -47,16 +48,17 @@ class Perceptron(Classifier):
 
         for data, cls in dataset:
             # add this image to the array for its class
-            classes[cls].append(np.array(data.flat_data()))
+            data = np.array(data.flat_data())
+            classes[cls].append(data)
             for label in self.legalLabels:
                 # add it to the "inverse" set of images for all other labels
                 if label != cls:
-                    inverse_classes[label].append(np.array(data.flat_data()))
+                    inverse_classes[label].append(data)
         return classes, inverse_classes
 
     def _classify_img(self, flat_img, bias, weights):
-        total = bias + (flat_img * weights).sum()
-        return 1 / (1 + np.math.exp(-0.1 * total))
+        total = bias + np.dot(flat_img, weights)
+        return 1 / (1 + math.exp(-0.1 * total))
 
     def train(self, training_data, validation_data):
         """

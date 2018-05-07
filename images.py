@@ -3,13 +3,14 @@
 class Datum:
     def __init__(self, data):
         self._data = data
+        self._flat = [pixel for line in self._data for pixel in line]
         self._value = 0
 
     def data(self):
-        return self._data.copy()
+        return self._data
 
     def flat_data(self):
-        return [pixel for line in self._data for pixel in line]
+        return self._flat
 
     def get_pixel(self, x, y):
         return self._data[y][x]
