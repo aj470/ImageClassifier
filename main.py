@@ -73,7 +73,7 @@ def main():
     parser.add_argument("-f", "--full-eval", help="Run all algorithms on both faces and digits",
                         action='store_true', default=None)
     parser.add_argument("-a", "--algorithm", type=int, choices=[1, 2, 3, 4, 5],
-                        help="1. Perceptron, 2. Naive Bayes Classifier, 3. Custom", default=None)
+                        help="1. Perceptron, 2. Naive Bayes Classifier, 3. K-nearest neighbors", default=None)
     parser.add_argument("-d", "--data", type=str, choices=["face", "digit"],
                         help="whether to evaluate faces or digits", default=None)
     parser.add_argument("-c", "--csv", help="Output CSV data",
