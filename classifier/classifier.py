@@ -18,10 +18,8 @@ class Classifier:
             distribution[answer][guess] += 1
         if print_distribution:
             print("label", end="")
-            sep = ""
             for i in self.legalLabels:
-                print(sep + str(i), end="")
-                sep = ","
+                print("," + str(i), end="")
             print()
             for i in range(len(distribution)):
                 print(i, end=",")
