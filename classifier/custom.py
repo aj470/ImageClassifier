@@ -1,7 +1,5 @@
 from .classifier import *
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 
 
 class CustomClassifier(Classifier):
@@ -96,20 +94,6 @@ class CustomClassifier(Classifier):
             testing_error[0, k.index(item)] = error/validation_examples
             
         self.k = k[list(testing_error[0]).index(min(testing_error[0]))]
-        print(self.k)
-        
-        plt.xlabel('Value of K')
-        plt.ylabel('Error')
-        
-        red_box = mpatches.Patch(color='red', label='Test Error')
-        green_box = mpatches.Patch(color='green', label='Traning Error')
-
-        plt.legend(handles=[red_box,green_box])
-
-        plt.plot(k, testing_error[0], color='red', marker='*')
-        plt.title('knn Classifier')
-        plt.savefig(str(training_examples)+'.pdf')
-
         return self.validate(validation_data)
 
     def classify(self, data):
